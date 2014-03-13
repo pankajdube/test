@@ -27,6 +27,7 @@
 #include <linux/of_address.h>
 #include <linux/clk-provider.h>
 #include <linux/clk/ti.h>
+#include <linux/reset/reset_ti.h>
 
 #include "soc.h"
 #include "prm2xxx_3xxx.h"
@@ -523,6 +524,9 @@ int __init of_prcm_init(void)
 		mem = of_iomap(np, 0);
 		clk_memmaps[memmap_index] = mem;
 		ti_dt_clk_init_provider(np, memmap_index);
+
+		ti_dt_reset_init(np);
+
 		memmap_index++;
 	}
 

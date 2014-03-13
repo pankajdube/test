@@ -13,3 +13,12 @@ menuconfig RESET_CONTROLLER
 	  If unsure, say no.
 
 source "drivers/reset/sti/Kconfig"
+
+config RESET_TI
+	depends on RESET_CONTROLLER
+	bool "TI reset controller"
+	help
+	  Reset controller support for TI SoC's
+
+	  Reset controller found in TI's AM series of SoC's like
+	  AM335x and AM43x and OMAP SoC's like OMAP5 and DRA7
