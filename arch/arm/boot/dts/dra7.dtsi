@@ -121,6 +121,10 @@
 
 			prm_clockdomains: clockdomains {
 			};
+
+			prm_resets: resets {
+				#reset-cells = <1>;
+			};
 		};
 
 		cm_core_aon: cm_core_aon@4a005000 {
@@ -998,3 +1002,4 @@
 };
 
 /include/ "dra7xx-clocks.dtsi"
+/include/ "dra7xx-resets.dtsi"

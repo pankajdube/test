@@ -1,0 +1,35 @@
+Texas Instruments Reset Controller
+======================================
+Please also refer to reset.txt in this directory for common reset
+controller binding usage.
+
+Required properties:
+- rstctrl_offs: The reset control offset in the reset controller for the IP
+	module to be reset.
+- ctrl_bit-shift: The bit in the reset control register for the IP
+	module to be reset.
+- rstst_offs: The reset status offset in the reset controller for the IP
+	module to be reset.
+- sts_bit-shift: The bit in the reset control register for the IP
+	module to be reset.
+
+example:
+
+&prm_resets {
+	device_reset: device_reset {
+			rstctrl_offs = <0x1310>;
+			ctrl_bit-shift = <0>;
+			rstst_offs	= <0x1314>;
+			sts_bit-shift	= <0>;
+	};
+};
+
+Specifying the reset entries for the IP module
+==============================================
+The entries below are described in the reset.txt the
+in this directory.
+
+src: src@55082000 {
+        resets = <&reset_src &phandle_of_reset>;
+		reset-names = "reset_name";
+};

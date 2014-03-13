@@ -1,0 +1,17 @@
+/*
+ * Device Tree Source for DRA7xx reset data
+ *
+ * Copyright (C) 2014 Texas Instruments, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+&prm_resets {
+	device_reset: device_reset {
+			rstctrl_offs = <0x1310>;
+			ctrl_bit-shift = <0>;
+			rstst_offs	= <0x1314>;
+			sts_bit-shift	= <0>;
+	};
+};

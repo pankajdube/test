@@ -134,6 +134,10 @@
 
 			prm_clockdomains: clockdomains {
 			};
+
+			prm_resets: resets {
+				#reset-cells = <1>;
+			};
 		};
 
 		cm_core_aon: cm_core_aon@4a004000 {
@@ -552,6 +556,8 @@
 			interrupts = <GIC_SPI 100 IRQ_TYPE_LEVEL_HIGH>;
 			ti,hwmods = "mmu_ipu";
 			ti,iommu-bus-err-back;
+			resets = <&prm_resets &ipu_reset_cpu0>;
+			reset-names = "ipu_reset_cpu0";
 		};
 
 		keypad: keypad@4ae1c000 {
@@ -922,3 +928,4 @@
 };
 
 /include/ "omap54xx-clocks.dtsi"
+/include/ "omap54xx-resets.dtsi"
