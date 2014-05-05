@@ -17,6 +17,13 @@ Required properties:
 		 so crossbar bar driver should not consider them as free
 		 lines.
 
+Optional properties:
+- ti,irqs-safe-map: integer which maps to a safe configuration to use
+  when the interrupt controller irq is unused (when not provided, default is 0)
+- ti,irqs-skip: This is similar to "ti,irqs-reserved", but are irq mappings
+  which are not supposed to be used for errata or other reasons(virtualization).
+
+
 Examples:
 		crossbar_mpu: @4a020000 {
 			compatible = "ti,irq-crossbar";
