@@ -36,11 +36,15 @@ struct pcie_port {
 	u8			root_bus_nr;
 	void __iomem		*dbi_base;
 	u64			cfg0_base;
+	u64			cfg0_mod_addr;
 	void __iomem		*va_cfg0_base;
 	u64			cfg1_base;
+	u64			cfg1_mod_addr;
 	void __iomem		*va_cfg1_base;
 	u64			io_base;
+	u64			io_mod_addr;
 	u64			mem_base;
+	u64			mem_mod_addr;
 	spinlock_t		conf_lock;
 	struct resource		cfg;
 	struct resource		io;
