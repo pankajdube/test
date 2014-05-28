@@ -6,6 +6,7 @@ Required properties:
 	as "samsung,exynos5440-pcie" or "fsl,imx6q-pcie".
 - reg: base addresses and lengths of the pcie controller,
 	the phy controller, additional register for the phy controller.
+	The configuration address space should also be specified here.
 - interrupts: interrupt values for level interrupt,
 	pulse interrupt, special interrupt.
 - clocks: from common clock binding: handle to pci clock.
