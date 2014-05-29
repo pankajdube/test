@@ -1055,6 +1055,8 @@
 				#interrupt-cells = <1>;
 				num-lanes = <1>;
 				ti,hwmods = "pcie1";
+				resets = <&prm_resets &device_reset>;
+				reset-names = "reset";
 				phys = <&pcie1_phy>;
 				phy-names = "pcie-phy0";
 				interrupt-map-mask = <0 0 0 7>;
