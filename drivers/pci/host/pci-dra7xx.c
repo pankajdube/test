@@ -22,6 +22,7 @@
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
 #include <linux/resource.h>
+#include <linux/reset.h>
 #include <linux/types.h>
 
 #include "pcie-designware.h"
@@ -332,6 +333,7 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct device_node *np = dev->of_node;
 	char name[10];
+	struct reset_control *rstc;
 
 	dra7xx = devm_kzalloc(dev, sizeof(*dra7xx), GFP_KERNEL);
 	if (!dra7xx)
@@ -354,6 +356,14 @@ static int __init dra7xx_pcie_probe(struct platform_device *pdev)
 	base = devm_ioremap_nocache(dev, res->start, resource_size(res));
 	if (!base)
 		return -ENOMEM;
+
+	rstc = devm_reset_control_get(dev, "reset");
+	if (IS_ERR(rstc))
+		return PTR_ERR(rstc);
+
+	ret = reset_control_deassert(rstc);
+	if (ret)
+		return ret;
 
 	phy_count = of_property_count_strings(np, "phy-names");
 	if (phy_count < 0) {

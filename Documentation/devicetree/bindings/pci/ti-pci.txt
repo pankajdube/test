@@ -22,6 +22,8 @@ PCIe Designware Controller
    num-lanes,
    interrupt-map-mask,
    interrupt-map : as specified in ../designware-pcie.txt
+ - resets: phandle used if reset is handled be soc
+ - reset-names: name given to the phandle
 
 Example:
 axi {
@@ -45,6 +47,8 @@ axi {
 		ti,hwmods = "pcie1";
 		phys = <&pcie1_phy>;
 		phy-names = "pcie-phy0";
+		resets = <&prm_resets &device_reset>;
+		reset-names = "reset";
 		interrupt-map-mask = <0 0 0 7>;
 		interrupt-map = <0 0 0 1 &pcie_intc 1>,
 				<0 0 0 2 &pcie_intc 2>,
