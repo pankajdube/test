@@ -27,6 +27,8 @@ specifier is required.
 dma-names: List of DMA request names. These strings correspond
 1:1 with the DMA specifiers listed in dmas. The string naming is
 to be "rx" and "tx" for RX and TX DMA requests, respectively.
+ti,require_iodelay: Should be set for platforms that require iodelay values to be
+programmed.
 
 Examples:
 

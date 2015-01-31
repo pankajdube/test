@@ -242,6 +242,10 @@ struct omap_hsmmc_host {
 	int			tuning_fsrc;
 	u32			tuning_uhsmc;
 	u32			tuning_opcode;
+	bool			require_io_delay;
+	struct pinctrl		*pinctrl;
+	struct pinctrl_state	*state;
+	bool			default_state;
 	struct omap_hsmmc_next	next_data;
 	struct	omap_mmc_platform_data	*pdata;
 };
@@ -703,11 +707,62 @@ static void omap_hsmmc_set_clock(struct omap_hsmmc_host *host)
 	unsigned long regval;
 	unsigned long timeout;
 	unsigned long clkdiv;
+	int ret;
+	char *mode;
 
 	dev_vdbg(mmc_dev(host->mmc), "Set clock to %uHz\n", ios->clock);
 
 	omap_hsmmc_stop_clock(host);
 
+	if (!host->require_io_delay)
+		goto no_io_delay;
+
+	switch (ios->timing) {
+	case MMC_TIMING_UHS_SDR104:
+		mode = kstrdup("sdr104", GFP_KERNEL);
+		break;
+	case MMC_TIMING_UHS_DDR50:
+		mode = kstrdup("ddr50", GFP_KERNEL);
+		break;
+	case MMC_TIMING_UHS_SDR50:
+		mode = kstrdup("sdr50", GFP_KERNEL);
+		break;
+	case MMC_TIMING_SD_HS:
+	case MMC_TIMING_MMC_HS:
+		mode = kstrdup("hs", GFP_KERNEL);
+		break;
+	case MMC_TIMING_UHS_SDR25:
+		mode = kstrdup("sdr25", GFP_KERNEL);
+		break;
+	case MMC_TIMING_UHS_SDR12:
+		mode = kstrdup("sdr12", GFP_KERNEL);
+		break;
+	case MMC_TIMING_MMC_HS200:
+		mode = kstrdup("hs200", GFP_KERNEL);
+		break;
+	default:
+		dev_vdbg(mmc_dev(host->mmc), "no io delay setting\n");
+		goto no_io_delay;
+	}
+
+	host->state = pinctrl_lookup_state(host->pinctrl, mode);
+	if (IS_ERR(host->state)) {
+		dev_dbg(mmc_dev(host->mmc),
+			"no pinctrl state for %s mode\n", mode);
+		goto no_io_delay;
+	}
+
+	ret = pinctrl_select_state(host->pinctrl, host->state);
+	if (ret) {
+		dev_dbg(mmc_dev(host->mmc),
+			"failed to activate pinctrl state\n");
+		goto no_io_delay;
+	}
+
+	host->default_state = false;
+	kfree(mode);
+
+no_io_delay:
 	regval = OMAP_HSMMC_READ(host->base, SYSCTL);
 	regval = regval & ~(CLKD_MASK | DTO_MASK);
 	clkdiv = calc_divisor(host, ios);
@@ -1432,6 +1487,13 @@ static irqreturn_t omap_hsmmc_detect(int irq, void *dev_id)
 		mmc_detect_change(host->mmc, (HZ * 200) / 1000);
 	else
 		mmc_detect_change(host->mmc, (HZ * 50) / 1000);
+
+	if (host->require_io_delay && !host->mmc->card &&
+	    !host->default_state) {
+		pinctrl_pm_select_default_state(host->dev);
+		host->default_state = true;
+	}
+
 	return IRQ_HANDLED;
 }
 
@@ -2343,7 +2405,6 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
 	const struct of_device_id *match;
 	dma_cap_mask_t mask;
 	unsigned tx_req, rx_req;
-	struct pinctrl *pinctrl;
 	const struct omap_mmc_of_data *data;
 	void __iomem *base;
 
@@ -2436,6 +2497,25 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
 	if (host->pdata->controller_flags & OMAP_HSMMC_BROKEN_MULTIBLOCK_READ) {
 		dev_info(&pdev->dev, "multiblock reads disabled due to 35xx erratum 2.1.1.128; MMC read performance may suffer\n");
 		mmc->caps2 |= MMC_CAP2_NO_MULTI_READ;
+	}
+
+	host->pinctrl = devm_pinctrl_get(&pdev->dev);
+	if (!IS_ERR(host->pinctrl)) {
+		host->state = pinctrl_lookup_state(host->pinctrl, "default");
+		if (!IS_ERR(host->state)) {
+			ret = pinctrl_select_state(host->pinctrl,
+						   host->state);
+			if (ret)
+				dev_dbg(mmc_dev(host->mmc),
+					"failed to activate pinctrl state\n");
+		} else {
+			dev_dbg(mmc_dev(host->mmc),
+				"no pinctrl state for default mode\n");
+		}
+		host->default_state = true;
+	} else {
+		dev_warn(&pdev->dev,
+			 "pins are not configured from the driver\n");
 	}
 
 	pm_runtime_enable(host->dev);
@@ -2579,10 +2659,8 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
 
 	omap_hsmmc_disable_irq(host);
 
-	pinctrl = devm_pinctrl_get_select_default(&pdev->dev);
-	if (IS_ERR(pinctrl))
-		dev_warn(&pdev->dev,
-			"pins are not configured from the driver\n");
+	host->require_io_delay = of_property_read_bool(np,
+						       "ti,require_iodelay");
 
 	omap_hsmmc_protect_card(host);
 
@@ -2709,12 +2787,16 @@ static int omap_hsmmc_suspend(struct device *dev)
 static int omap_hsmmc_resume(struct device *dev)
 {
 	struct omap_hsmmc_host *host = dev_get_drvdata(dev);
+	int ret;
 
 	if (!host)
 		return 0;
 
-	/* Select default pin state */
-	pinctrl_pm_select_default_state(host->dev);
+	if (!IS_ERR(host->state))
+		ret = pinctrl_select_state(host->pinctrl, host->state);
+		if (ret)
+			dev_dbg(mmc_dev(host->mmc),
+				"failed to activate pinctrl state\n");
 
 	pm_runtime_get_sync(host->dev);
 
