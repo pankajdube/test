@@ -350,11 +350,13 @@ static int omap_hsmmc_reg_get(struct omap_hsmmc_host *host)
 	struct regulator *reg;
 	int ocr_value = 0;
 
-	reg = devm_regulator_get(host->dev, "vmmc");
+	reg = devm_regulator_get_optional(host->dev, "vmmc");
 	if (IS_ERR(reg)) {
-		dev_err(host->dev, "unable to get vmmc regulator %ld\n",
-			PTR_ERR(reg));
-		return PTR_ERR(reg);
+		if (PTR_ERR(reg) == -EPROBE_DEFER)
+			return -EPROBE_DEFER;
+		host->vcc = NULL;
+		dev_info(host->dev, "unable to get vmmc regulator %ld\n",
+			 PTR_ERR(reg));
 	} else {
 		host->vcc = reg;
 		ocr_value = mmc_regulator_get_ocrmask(reg);
