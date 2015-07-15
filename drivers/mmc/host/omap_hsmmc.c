@@ -347,19 +347,17 @@ error_set_power:
 
 static int omap_hsmmc_reg_get(struct omap_hsmmc_host *host)
 {
-	struct regulator *reg;
 	int ocr_value = 0;
 
-	reg = devm_regulator_get_optional(host->dev, "vmmc");
-	if (IS_ERR(reg)) {
-		if (PTR_ERR(reg) == -EPROBE_DEFER)
+	host->vcc = devm_regulator_get_optional(host->dev, "vmmc");
+	if (IS_ERR(host->vcc)) {
+		if (PTR_ERR(host->vcc) == -EPROBE_DEFER)
 			return -EPROBE_DEFER;
-		host->vcc = NULL;
 		dev_info(host->dev, "unable to get vmmc regulator %ld\n",
-			 PTR_ERR(reg));
+			 PTR_ERR(host->vcc));
+		host->vcc = NULL;
 	} else {
-		host->vcc = reg;
-		ocr_value = mmc_regulator_get_ocrmask(reg);
+		ocr_value = mmc_regulator_get_ocrmask(host->vcc);
 		if (!mmc_pdata(host)->ocr_mask) {
 			mmc_pdata(host)->ocr_mask = ocr_value;
 		} else {
@@ -374,26 +372,22 @@ static int omap_hsmmc_reg_get(struct omap_hsmmc_host *host)
 	mmc_pdata(host)->set_power = omap_hsmmc_set_power;
 
 	/* Allow an aux regulator */
-	reg = devm_regulator_get_optional(host->dev, "vmmc_aux");
-	if (IS_ERR(reg)) {
-		if (PTR_ERR(reg) == -EPROBE_DEFER)
+	host->vcc_aux = devm_regulator_get_optional(host->dev, "vmmc_aux");
+	if (IS_ERR(host->vcc_aux)) {
+		if (PTR_ERR(host->vcc_aux) == -EPROBE_DEFER)
 			return -EPROBE_DEFER;
-		host->vcc_aux = NULL;
 		dev_info(host->dev, "unable to get vmmc_aux regulator %ld\n",
-			 PTR_ERR(reg));
-	} else {
-		host->vcc_aux = reg;
+			 PTR_ERR(host->vcc_aux));
+		host->vcc_aux = NULL;
 	}
 
-	reg = devm_regulator_get_optional(host->dev, "pbias");
-	if (IS_ERR(reg)) {
-		if (PTR_ERR(reg) == -EPROBE_DEFER)
+	host->pbias = devm_regulator_get_optional(host->dev, "pbias");
+	if (IS_ERR(host->pbias)) {
+		if (PTR_ERR(host->pbias) == -EPROBE_DEFER)
 			return -EPROBE_DEFER;
-		host->pbias = NULL;
 		dev_info(host->dev, "unable to get pbias regulator %ld\n",
-			 PTR_ERR(reg));
-	} else {
-		host->pbias = reg;
+			 PTR_ERR(host->pbias));
+		host->pbias = NULL;
 	}
 
 	/* For eMMC do not power off when not in sleep state */
