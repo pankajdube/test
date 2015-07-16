@@ -2160,7 +2160,13 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
 			goto err_irq;
 	}
 
-	mmc->ocr_avail = mmc_pdata(host)->ocr_mask;
+	if (!mmc_pdata(host)->ocr_mask) {
+		ret = mmc_of_parse_voltage(pdev->dev.of_node, &mmc->ocr_avail);
+		if (ret)
+			goto err_slot_name;
+	} else {
+		mmc->ocr_avail = mmc_pdata(host)->ocr_mask;
+	}
 
 	omap_hsmmc_disable_irq(host);
 
