@@ -181,7 +181,6 @@ struct omap_hsmmc_host {
 	struct	clk		*fclk;
 	struct	clk		*dbclk;
 	struct	regulator	*pbias;
-	bool			pbias_enabled;
 	bool			vqmmc_enabled;
 	void	__iomem		*base;
 	resource_size_t		mapbase;
@@ -325,15 +324,11 @@ static int omap_hsmmc_set_power(struct device *dev, int power_on, int vdd)
 	if (mmc_pdata(host)->before_set_reg)
 		mmc_pdata(host)->before_set_reg(dev, power_on, vdd);
 
-	if (host->pbias) {
-		if (host->pbias_enabled == 1) {
-			ret = regulator_disable(host->pbias);
-			if (ret) {
-				dev_err(dev, "pbias reg disable failed\n");
-				return ret;
-			} else {
-				host->pbias_enabled = 0;
-			}
+	if (host->pbias && regulator_is_enabled(host->pbias)) {
+		ret = regulator_disable(host->pbias);
+		if (ret) {
+			dev_err(dev, "pbias reg disable failed\n");
+			return ret;
 		}
 	}
 
@@ -371,14 +366,10 @@ static int omap_hsmmc_set_power(struct device *dev, int power_on, int vdd)
 		if (ret < 0)
 			goto err_set_voltage;
 
-		if (host->pbias_enabled == 0) {
-			ret = regulator_enable(host->pbias);
-			if (ret) {
-				dev_err(dev, "pbias reg enable failed\n");
-				goto err_set_voltage;
-			} else {
-				host->pbias_enabled = 1;
-			}
+		ret = regulator_enable(host->pbias);
+		if (ret) {
+			dev_err(dev, "pbias reg enable failed\n");
+			goto err_set_voltage;
 		}
 	}
 
@@ -2060,7 +2051,6 @@ static int omap_hsmmc_probe(struct platform_device *pdev)
 	host->base	= base + pdata->reg_offset;
 	host->power_mode = MMC_POWER_OFF;
 	host->next_data.cookie = 1;
-	host->pbias_enabled = 0;
 	host->vqmmc_enabled = 0;
 
 	ret = omap_hsmmc_gpio_init(mmc, host, pdata);
