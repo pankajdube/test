@@ -351,6 +351,7 @@ static int omap_hsmmc_set_power(struct device *dev, int power_on, int vdd)
 		ret = omap_hsmmc_disable_supply(mmc);
 		if (ret)
 			return ret;
+		goto after_set_reg;
 	}
 
 	if (host->pbias) {
@@ -374,6 +375,7 @@ static int omap_hsmmc_set_power(struct device *dev, int power_on, int vdd)
 		}
 	}
 
+after_set_reg:
 	if (mmc_pdata(host)->after_set_reg)
 		mmc_pdata(host)->after_set_reg(dev, power_on, vdd);
 
