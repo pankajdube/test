@@ -1310,6 +1310,7 @@ static struct omap_hwmod dra7xx_mmc1_hwmod = {
 	.name		= "mmc1",
 	.class		= &dra7xx_mmc_hwmod_class,
 	.clkdm_name	= "l3init_clkdm",
+	.flags		= HWMOD_SWSUP_SIDLE,
 	.main_clk	= "mmc1_fclk_div",
 	.prcm = {
 		.omap4 = {
