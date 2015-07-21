@@ -113,6 +113,13 @@
 
 /* AC12 */
 #define AC12_V1V8_SIGEN		(1 << 19)
+#define AC12_UHSMC_MASK		(7 << 16)
+#define AC12_UHSMC_SDR12	(0 << 16)
+#define AC12_UHSMC_SDR25	(1 << 16)
+#define AC12_UHSMC_SDR50	(2 << 16)
+#define AC12_UHSMC_SDR104	(3 << 16)
+#define AC12_UHSMC_DDR50	(4 << 16)
+#define AC12_UHSMC_RES		(0x7 << 16)
 
 /* Interrupt masks for IE and ISE register */
 #define CC_EN			(1 << 0)
@@ -634,6 +641,31 @@ static void omap_hsmmc_set_clock(struct omap_hsmmc_host *host)
 	dev_vdbg(mmc_dev(host->mmc), "Set clock to %uHz\n", ios->clock);
 
 	omap_hsmmc_stop_clock(host);
+
+	regval = OMAP_HSMMC_READ(host->base, AC12);
+	regval &= ~AC12_UHSMC_MASK;
+	switch (ios->timing) {
+	case MMC_TIMING_UHS_SDR104:
+	case MMC_TIMING_MMC_HS200:
+		regval |= AC12_UHSMC_SDR104;
+		break;
+	case MMC_TIMING_UHS_DDR50:
+		regval |= AC12_UHSMC_DDR50;
+		break;
+	case MMC_TIMING_UHS_SDR50:
+		regval |= AC12_UHSMC_SDR50;
+		break;
+	case MMC_TIMING_UHS_SDR25:
+		regval |= AC12_UHSMC_SDR25;
+		break;
+	case MMC_TIMING_UHS_SDR12:
+		regval |= AC12_UHSMC_SDR12;
+		break;
+	default:
+		regval |= AC12_UHSMC_RES;
+		break;
+	}
+	OMAP_HSMMC_WRITE(host->base, AC12, regval);
 
 	regval = OMAP_HSMMC_READ(host->base, SYSCTL);
 	regval = regval & ~(CLKD_MASK | DTO_MASK);
