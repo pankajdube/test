@@ -474,12 +474,15 @@
 	vmmc-supply = <&evm_3v3_sd>;
 	vmmc_aux-supply = <&ldo1_reg>;
 	bus-width = <4>;
+	max-frequency = <96000000>;
 };
 
 &mmc2 {
 	status = "okay";
 	vmmc-supply = <&mmc2_3v3>;
 	bus-width = <8>;
+	max-frequency = <96000000>;
+	/delete-property/ mmc-hs200-1_8v;
 };
 
 &cpu0 {
