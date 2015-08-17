@@ -12,6 +12,7 @@
 #include <linux/err.h>
 #include <linux/of.h>
 #include <linux/of_platform.h>
+#include <linux/pinctrl/devinfo.h>
 
 #include <linux/mmc/host.h>
 
@@ -64,6 +65,10 @@ int mmc_pwrseq_alloc(struct mmc_host *host)
 		ret = -ENODEV;
 		goto err;
 	}
+
+	ret = pinctrl_bind_pins(&pdev->dev);
+	if (ret)
+		goto err;
 
 	match = mmc_pwrseq_find(np);
 	if (IS_ERR(match)) {
