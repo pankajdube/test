@@ -107,3 +107,11 @@
 		status = "disabled";
 	};
 };
+
+&omap_dwc3_1 {
+	status = "disabled";
+};
+
+&pcie1 {
+	phys = <&pcie1_phy>, <&usb3_phy1>;
+};
