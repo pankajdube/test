@@ -304,6 +304,7 @@ static int ti_pipe3_init(struct phy *x)
 		val = ti_pipe3_readl(phy->phy_tx, PHY_TX_TEST_CONFIG);
 		val |= MEM_ENTESTCLK;
 		ti_pipe3_writel(phy->phy_tx, PHY_TX_TEST_CONFIG, val);
+		return 0;
 	}
 
 	/*

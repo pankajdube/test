@@ -235,8 +235,8 @@
 				num-lanes = <2>;
 				phys = <&pcie1_phy>, <&pcie2_phy>;
 				phy-names = "pcie-phy0", "pcie-phy1";
-				syscon = <&dra7_ctrl_core 0x558>;
-				syscon-pcie = <&scm_conf_pcie 0x18>;
+				syscon-lane-conf = <&scm_conf 0x558>;
+				syscon-lane-sel = <&scm_conf_pcie 0x18>;
 				ti,hwmods = "pcie1";
 				interrupt-map-mask = <0 0 0 7>;
 				interrupt-map = <0 0 0 1 &pcie1_intc 1>,
