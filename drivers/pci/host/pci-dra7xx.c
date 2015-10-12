@@ -565,12 +565,19 @@ static int dra7xx_pcie_suspend(struct device *dev)
 {
 	struct dra7xx_pcie *dra7xx = dev_get_drvdata(dev);
 	struct pcie_port *pp = &dra7xx->pp;
+	int count = dra7xx->lanes;
 	u32 val;
 
 	/* clear MSE */
 	val = dra7xx_pcie_readl_rc(pp, PCI_COMMAND);
 	val &= ~PCI_COMMAND_MEMORY;
 	dra7xx_pcie_writel_rc(pp, PCI_COMMAND, val);
+
+	while (count > 1) {
+		count--;
+		phy_power_off(dra7xx->phy[count]);
+		phy_exit(dra7xx->phy[count]);
+	}
 
 	return 0;
 }
@@ -579,37 +586,17 @@ static int dra7xx_pcie_resume(struct device *dev)
 {
 	struct dra7xx_pcie *dra7xx = dev_get_drvdata(dev);
 	struct pcie_port *pp = &dra7xx->pp;
+	int phy_count = dra7xx->lanes;
 	u32 val;
+	int i;
+	int ret;
 
 	/* set MSE */
 	val = dra7xx_pcie_readl_rc(pp, PCI_COMMAND);
 	val |= PCI_COMMAND_MEMORY;
 	dra7xx_pcie_writel_rc(pp, PCI_COMMAND, val);
 
-	return 0;
-}
-
-static int dra7xx_pcie_suspend_noirq(struct device *dev)
-{
-	struct dra7xx_pcie *dra7xx = dev_get_drvdata(dev);
-	int count = dra7xx->lanes;
-
-	while (count--) {
-		phy_power_off(dra7xx->phy[count]);
-		phy_exit(dra7xx->phy[count]);
-	}
-
-	return 0;
-}
-
-static int dra7xx_pcie_resume_noirq(struct device *dev)
-{
-	struct dra7xx_pcie *dra7xx = dev_get_drvdata(dev);
-	int phy_count = dra7xx->lanes;
-	int ret;
-	int i;
-
-	for (i = 0; i < phy_count; i++) {
+	for (i = 1; i < phy_count; i++) {
 		ret = phy_init(dra7xx->phy[i]);
 		if (ret < 0)
 			goto err_phy;
@@ -630,6 +617,34 @@ err_phy:
 	}
 
 	return ret;
+}
+
+static int dra7xx_pcie_suspend_noirq(struct device *dev)
+{
+	struct dra7xx_pcie *dra7xx = dev_get_drvdata(dev);
+
+	phy_power_off(dra7xx->phy[0]);
+	phy_exit(dra7xx->phy[0]);
+
+	return 0;
+}
+
+static int dra7xx_pcie_resume_noirq(struct device *dev)
+{
+	struct dra7xx_pcie *dra7xx = dev_get_drvdata(dev);
+	int ret;
+
+	ret = phy_init(dra7xx->phy[0]);
+	if (ret < 0)
+		return ret;
+
+	ret = phy_power_on(dra7xx->phy[0]);
+	if (ret < 0) {
+		phy_exit(dra7xx->phy[0]);
+		return ret;
+	}
+
+	return 0;
 }
 #endif
 
