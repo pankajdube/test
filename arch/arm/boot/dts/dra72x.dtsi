@@ -123,3 +123,16 @@
 		status = "disabled";
 	};
 };
+
+&omap_dwc3_1 {
+	status = "disabled";
+};
+
+&usb3_phy1 {
+	ti,usb3_as_pcie;
+};
+
+&pcie1 {
+	compatible = "ti,dra72-pcie";
+	phys = <&pcie1_phy>, <&usb3_phy1>;
+};
