@@ -250,10 +250,12 @@
 				ranges = <0x81000000 0 0          0x03000 0 0x00010000
 					  0x82000000 0 0x20013000 0x13000 0 0xffed000>;
 				#interrupt-cells = <1>;
-				num-lanes = <1>;
+				num-lanes = <2>;
 				ti,hwmods = "pcie1";
-				phys = <&pcie1_phy>;
-				phy-names = "pcie-phy0";
+				phys = <&pcie1_phy>, <&pcie2_phy>;
+				phy-names = "pcie-phy0", "pcie-phy1";
+				syscon-lane-conf = <&scm_conf 0x558>;
+				syscon-lane-sel = <&scm_conf_pcie 0x18>;
 				interrupt-map-mask = <0 0 0 7>;
 				interrupt-map = <0 0 0 1 &pcie1_intc 1>,
 						<0 0 0 2 &pcie1_intc 2>,
@@ -1587,7 +1589,6 @@
 					      "wkupclk", "refclk",
 					      "div-clk", "phy-div", "sysclk";
 				#phy-cells = <0>;
-				status = "disabled";
 			};
 		};
 
