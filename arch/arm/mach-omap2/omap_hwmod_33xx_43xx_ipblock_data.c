@@ -161,6 +161,7 @@ struct omap_hwmod am33xx_pruss_hwmod = {
 	},
 	.rst_lines	= am33xx_pruss_resets,
 	.rst_lines_cnt	= ARRAY_SIZE(am33xx_pruss_resets),
+	.flags		= HWMOD_CUSTOM_HARDRESET,
 };
 
 /* gfx */
@@ -185,6 +186,7 @@ struct omap_hwmod am33xx_gfx_hwmod = {
 	},
 	.rst_lines	= am33xx_gfx_resets,
 	.rst_lines_cnt	= ARRAY_SIZE(am33xx_gfx_resets),
+	.flags		= HWMOD_CUSTOM_HARDRESET,
 };
 
 /*

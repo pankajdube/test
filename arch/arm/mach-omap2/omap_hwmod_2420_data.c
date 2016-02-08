@@ -59,6 +59,7 @@ static struct omap_hwmod omap2420_iva_hwmod = {
 	.clkdm_name	= "iva1_clkdm",
 	.rst_lines	= omap2420_iva_resets,
 	.rst_lines_cnt	= ARRAY_SIZE(omap2420_iva_resets),
+	.flags		= HWMOD_CUSTOM_HARDRESET,
 	.main_clk	= "iva1_ifck",
 };
 
@@ -78,6 +79,7 @@ static struct omap_hwmod omap2420_dsp_hwmod = {
 	.clkdm_name	= "dsp_clkdm",
 	.rst_lines	= omap2420_dsp_resets,
 	.rst_lines_cnt	= ARRAY_SIZE(omap2420_dsp_resets),
+	.flags		= HWMOD_CUSTOM_HARDRESET,
 	.main_clk	= "dsp_fck",
 };
 

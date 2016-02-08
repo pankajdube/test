@@ -55,6 +55,7 @@ static struct omap_hwmod omap2430_iva_hwmod = {
 	.clkdm_name	= "dsp_clkdm",
 	.rst_lines	= omap2430_iva_resets,
 	.rst_lines_cnt	= ARRAY_SIZE(omap2430_iva_resets),
+	.flags		= HWMOD_CUSTOM_HARDRESET,
 	.main_clk	= "dsp_fck",
 };
 

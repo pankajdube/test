@@ -73,6 +73,7 @@ static struct omap_hwmod am43xx_wkup_m3_hwmod = {
 	},
 	.rst_lines	= am33xx_wkup_m3_resets,
 	.rst_lines_cnt	= ARRAY_SIZE(am33xx_wkup_m3_resets),
+	.flags		= HWMOD_CUSTOM_HARDRESET,
 };
 
 static struct omap_hwmod am43xx_control_hwmod = {
