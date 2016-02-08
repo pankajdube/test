@@ -525,6 +525,17 @@ struct omap_hwmod_omap4_prcm {
  *     or idled.
  * HWMOD_OPT_CLKS_NEEDED: The optional clocks are needed for the module to
  *     operate and they need to be handled at the same time as the main_clk.
+ * HWMOD_CUSTOM_HARDRESET: By default, if a hwmod has PRCM hardreset
+ *     lines associated with it (i.e., a populated .rst_lines field in
+ *     the hwmod), the hwmod code will assert the hardreset lines when
+ *     the IP block is initially reset, deassert the hardreset lines
+ *     in _enable(), and reassert them in _shutdown().  If this flag
+ *     is set, the hwmod code will not deassert the hardreset lines in
+ *     _enable(), leaving this responsibility to the driver code.  This flag may
+ *     be needed for processor IP blocks that must be put into a WFI/HLT
+ *     state after reset is deasserted, lest the processor leave its MSTANDBY
+ *     signal deasserted, thus blocking the chip from entering a system-wide
+ *     low power state.
  */
 #define HWMOD_SWSUP_SIDLE			(1 << 0)
 #define HWMOD_SWSUP_MSTANDBY			(1 << 1)
@@ -541,6 +552,7 @@ struct omap_hwmod_omap4_prcm {
 #define HWMOD_SWSUP_SIDLE_ACT			(1 << 12)
 #define HWMOD_RECONFIG_IO_CHAIN			(1 << 13)
 #define HWMOD_OPT_CLKS_NEEDED			(1 << 14)
+#define HWMOD_CUSTOM_HARDRESET			(1 << 15)
 
 /*
  * omap_hwmod._int_flags definitions
