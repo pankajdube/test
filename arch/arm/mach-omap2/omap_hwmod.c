@@ -2077,7 +2077,7 @@ static int _enable_preprogram(struct omap_hwmod *oh)
  */
 static int _enable(struct omap_hwmod *oh)
 {
-	int r;
+	int r, i;
 	int hwsup = 0;
 
 	pr_debug("omap_hwmod: %s: enabling\n", oh->name);
@@ -2109,16 +2109,22 @@ static int _enable(struct omap_hwmod *oh)
 	}
 
 	/*
-	 * If an IP block contains HW reset lines and all of them are
-	 * asserted, we let integration code associated with that
-	 * block handle the enable.  We've received very little
+	 * If an IP block contains HW reset lines, all of them are
+	 * asserted, and the IP block is marked as requiring a custom
+	 * hardreset handler, we let integration code associated with
+	 * that block handle the enable.  We've received very little
 	 * information on what those driver authors need, and until
 	 * detailed information is provided and the driver code is
 	 * posted to the public lists, this is probably the best we
 	 * can do.
 	 */
-	if (_are_all_hardreset_lines_asserted(oh))
+	if ((oh->flags & HWMOD_CUSTOM_HARDRESET) &&
+	    _are_all_hardreset_lines_asserted(oh))
 		return 0;
+
+	/* If the IP block is an initiator, release it from hardreset */
+	for (i = 0; i < oh->rst_lines_cnt; i++)
+		_deassert_hardreset(oh, oh->rst_lines[i].name);
 
 	/* Mux pins for device runtime if populated */
 	if (oh->mux && (!oh->mux->enabled ||
