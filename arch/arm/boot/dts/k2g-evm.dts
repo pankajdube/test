@@ -72,8 +72,8 @@
 	mmc1_reg: fixedregulator-mmc1 {
 		compatible = "regulator-fixed";
 		regulator-name = "mmc1_fixed";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
 	};
 
