@@ -133,6 +133,6 @@
 };
 
 &pcie1 {
-	compatible = "ti,dra72-pcie";
+	compatible = "ti,dra726-pcie";
 	phys = <&pcie1_phy>, <&usb3_phy1>;
 };
