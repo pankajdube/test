@@ -219,13 +219,6 @@ static int ti_pipe3_power_on(struct phy *x)
 					 mask, val);
 		if (ret < 0)
 			return ret;
-
-		if (phy->flags & CONFIGURE_AS_PCIE) {
-			ret = regmap_update_bits(phy->phy_power_syscon,
-						 phy->power_reg, mask, val);
-			if (ret < 0)
-				return ret;
-		}
 	} else {
 		omap_control_phy_power(phy->control_dev, 1);
 	}

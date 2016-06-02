@@ -129,7 +129,7 @@
 };
 
 &usb3_phy1 {
-	ti,usb3_as_pcie;
+	ti,configure-as-pcie;
 };
 
 &pcie1 {
