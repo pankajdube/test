@@ -1697,6 +1697,7 @@
 			#size-cells = <1>;
 			utmi-mode = <2>;
 			ranges;
+			status = "disabled";
 			usb2: usb@488d0000 {
 				compatible = "snps,dwc3";
 				reg = <0x488d0000 0x17000>;

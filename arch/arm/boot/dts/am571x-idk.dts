@@ -330,3 +330,7 @@
 &pcie1 {
 	pcie-reset-gpio = <&gpio5 18 GPIO_ACTIVE_HIGH>;
 };
+
+&usb1 {
+        dr_mode = "host";
+};

@@ -125,7 +125,8 @@
 };
 
 &omap_dwc3_1 {
-	status = "disabled";
+	phys = <&usb2_phy1>;
+	phy-names = "usb2-phy";
 };
 
 &usb3_phy1 {

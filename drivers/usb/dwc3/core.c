@@ -1364,6 +1364,7 @@ static int dwc3_probe(struct platform_device *pdev)
 
 	pm_runtime_enable(dev);
 	pm_runtime_get_sync(dev);
+	pm_runtime_get_sync(dev);
 	pm_runtime_forbid(dev);
 
 	dwc3_cache_hwparams(dwc);
