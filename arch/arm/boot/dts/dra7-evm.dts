@@ -717,3 +717,7 @@
 		status = "okay";
 	};
 };
+
+&pcie1_rc {
+	status = "okay";
+};
