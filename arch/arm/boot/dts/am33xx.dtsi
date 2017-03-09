@@ -361,7 +361,7 @@
 		};
 
 		mmc1: mmc@48060000 {
-			compatible = "ti,omap4-hsmmc";
+			compatible = "ti,am33xx-hsmmc", "ti,omap4-hsmmc";
 			ti,hwmods = "mmc1";
 			ti,dual-volt;
 			ti,needs-special-reset;
@@ -376,7 +376,7 @@
 		};
 
 		mmc2: mmc@481d8000 {
-			compatible = "ti,omap4-hsmmc";
+			compatible = "ti,am33xx-hsmmc", "ti,omap4-hsmmc";
 			ti,hwmods = "mmc2";
 			ti,needs-special-reset;
 			dmas = <&edma 2 0
@@ -389,7 +389,7 @@
 		};
 
 		mmc3: mmc@47810000 {
-			compatible = "ti,omap4-hsmmc";
+			compatible = "ti,am33xx-hsmmc", "ti,omap4-hsmmc";
 			ti,hwmods = "mmc3";
 			ti,needs-special-reset;
 			interrupts = <29>;
